@@ -8,14 +8,6 @@ namespace System.Threading
     public delegate void ParameterizedThreadStart(object obj);
     public delegate void ThreadStart();
 
-    public class ThreadStateException : Exception
-    {
-        public ThreadStateException(string message = "", Exception innerException = null)
-            : base(message, innerException)
-        { }
-    }
-
-
     public class Thread
     {
         private Task _task;

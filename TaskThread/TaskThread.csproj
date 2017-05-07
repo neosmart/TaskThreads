@@ -13,6 +13,7 @@
     <PackageTags>system.threading.thread, uwp, uap, taskthreads</PackageTags>
     <PackageReleaseNotes>Initial release for UAP/UWP</PackageReleaseNotes>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Product>System.Threading.Thread for UWP/UAP</Product>
   </PropertyGroup>
 
 </Project>

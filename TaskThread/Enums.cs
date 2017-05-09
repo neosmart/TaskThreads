@@ -18,6 +18,7 @@
         Background,
         Unstarted,
         Stopped,
+        WaitSleepJoin,
         Suspended,
         AbortRequested,
         Aborted

@@ -124,27 +124,71 @@ namespace System.Threading
 
         public void Join()
         {
+            if (ThreadState == ThreadState.Unstarted)
+            {
+                throw new ThreadStateException("Cannot join an unstarted thread!");
+            }
+            if (this == CurrentThread)
+            {
+                //stop caller from doing something stupid
+                return;
+            }
+
+            CurrentThread.ThreadState = ThreadState.WaitSleepJoin;
             _task.Wait();
+            CurrentThread.ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
         }
 
         public bool Join(Int32 milliseconds)
         {
-            return _task.Wait(milliseconds);
+            if (ThreadState == ThreadState.Unstarted)
+            {
+                throw new ThreadStateException("Cannot join an unstarted thread!");
+            }
+            if (this == CurrentThread)
+            {
+                //stop caller from doing something stupid
+                return true;
+            }
+
+            CurrentThread.ThreadState = ThreadState.WaitSleepJoin;
+            bool waitResult = _task.Wait(milliseconds);
+            CurrentThread.ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
+
+            return waitResult;
         }
 
         public bool Join(TimeSpan timeout)
         {
-            return _task.Wait(timeout);
+            if (ThreadState == ThreadState.Unstarted)
+            {
+                throw new ThreadStateException("Cannot join an unstarted thread!");
+            }
+            if (this == CurrentThread)
+            {
+                //stop caller from doing something stupid
+                return true;
+            }
+
+            CurrentThread.ThreadState = ThreadState.WaitSleepJoin;
+            bool waitResult = _task.Wait(timeout);
+            CurrentThread.ThreadState = CurrentThread.IsBackground ? ThreadState.Background : ThreadState.Running;
+
+            return waitResult;
         }
 
         public static void Sleep(int milliseconds)
         {
+            CurrentThread.ThreadState = ThreadState.WaitSleepJoin;
             _unavailable.Wait(milliseconds);
+            CurrentThread.ThreadState = CurrentThread.IsBackground ? ThreadState.Background : ThreadState.Running;
         }
 
         public static void Sleep(TimeSpan duration)
         {
+            CurrentThread.ThreadState = ThreadState.WaitSleepJoin;
             _unavailable.Wait(duration);
+            CurrentThread.ThreadState = CurrentThread.IsBackground ? ThreadState.Background : ThreadState.Running;
         }
 
         public void Abort()

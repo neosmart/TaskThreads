@@ -14,8 +14,20 @@ namespace System.Threading
         private CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
         public string Name { get; set; } = string.Empty;
-        public bool IsBackground { get; set; } = false;
-        public bool IsAlive { get; set; } = false;
+        private bool _isBackground = false;
+        public bool IsBackground
+        {
+            get => _isBackground;
+            set
+            {
+                if (ThreadState != ThreadState.Unstarted)
+                {
+                    throw new ThreadStateException("Cannot change IsBackground property after thread has been started!");
+                }
+                _isBackground = value;
+            }
+        }
+        public bool IsAlive { get; private set; } = false;
         public CultureInfo CurrentCulture => throw new NotImplementedException();
         private static SemaphoreSlim _unavailable = new SemaphoreSlim(0, 1);
         private SemaphoreSlim _threadSuspend = new SemaphoreSlim(0, 1);

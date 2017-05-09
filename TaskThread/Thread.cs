@@ -99,7 +99,15 @@ namespace System.Threading
             IsAlive = true;
             ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
             _taskStarted.Set();
-            action();
+
+            try
+            {
+                action();
+            }
+            catch
+            {
+                //absorb all exceptions
+            }
         }
 
         public void Start()

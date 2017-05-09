@@ -28,6 +28,7 @@ namespace TaskThreadTest
         [TestMethod]
         public void ValidateThreadWork()
         {
+            //purposely using a separate event instead of relying on thread.Wait() to make this test independent
             var workDone = new ManualResetEventSlim(false);
 
             int x = 0;
@@ -143,6 +144,28 @@ namespace TaskThreadTest
             outerThread.Join();
 
             Assert.AreNotEqual(innerThread.ManagedThreadId, thisThread.ManagedThreadId);
+        }
+
+        [TestMethod]
+        public void ExceptionsNotBubbled()
+        {
+            bool exceptionThrown = false;
+
+            try
+            {
+                var thread = new Thread(() =>
+                {
+                    throw new Exception();
+                });
+                thread.Start();
+                thread.Join();
+            }
+            catch
+            {
+                exceptionThrown = true;
+            }
+
+            Assert.IsFalse(exceptionThrown);
         }
     }
 }

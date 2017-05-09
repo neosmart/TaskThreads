@@ -30,7 +30,7 @@ namespace System.Threading
         public bool IsAlive { get; private set; } = false;
         public CultureInfo CurrentCulture => throw new NotImplementedException();
         private static SemaphoreSlim _unavailable = new SemaphoreSlim(0, 1);
-        private SemaphoreSlim _threadSuspend = new SemaphoreSlim(0, 1);
+        private SemaphoreSlim _threadSuspend = null;
         public ThreadPriority Priority { get; set; } = ThreadPriority.Normal;
         public ThreadState ThreadState { get; private set; } = ThreadState.Unstarted;
 
@@ -172,6 +172,7 @@ namespace System.Threading
                 if (this == CurrentThread)
                 {
                     ThreadState = ThreadState.Suspended;
+                    _threadSuspend = new SemaphoreSlim(0, 1);
                     _threadSuspend.Wait();
                     ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
                 }
@@ -180,7 +181,7 @@ namespace System.Threading
 
         public void Resume()
         {
-            if (this == CurrentThread && ThreadState == ThreadState.Suspended)
+            if (_threadSuspend != null)
             {
                 _threadSuspend.Release();
             }

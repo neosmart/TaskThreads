@@ -111,6 +111,26 @@ namespace System.Threading
         {
             _unavailable.Wait(duration);
         }
+
+        public void Abort()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Suspend()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Resume()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void GetDomain()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 #endif

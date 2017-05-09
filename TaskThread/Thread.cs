@@ -15,7 +15,7 @@ namespace System.Threading
 
         public string Name { get; set; } = string.Empty;
         public bool IsBackground { get; set; } = false;
-        public bool IsAlive => _task != null && !(_task.IsCanceled || _task.IsCompleted || _task.IsFaulted);
+        public bool IsAlive { get; set; } = false;
         public CultureInfo CurrentCulture => throw new NotImplementedException();
         private static SemaphoreSlim _unavailable = new SemaphoreSlim(0, 1);
         private static SemaphoreSlim _threadSuspend = new SemaphoreSlim(0, 1);
@@ -25,7 +25,8 @@ namespace System.Threading
         [ThreadStatic]
         public static Thread CurrentThread = new Thread()
         {
-            ThreadState = ThreadState.Running
+            ThreadState = ThreadState.Running,
+            IsAlive = true,
         };
 
         private enum StartType
@@ -54,9 +55,9 @@ namespace System.Threading
 
         private void InnerStart(Action action)
         {
+            IsAlive = true;
             ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
             action();
-            ThreadState = ThreadState.Stopped;
         }
 
         public void Start()
@@ -72,6 +73,7 @@ namespace System.Threading
             }
 
             _task = new Task(() => InnerStart(() => _start()), _tokenSource.Token, TaskCreationOptions.LongRunning);
+            _task.ContinueWith((t) => { IsAlive = false; ThreadState = ThreadState.Stopped; });
             _task.Start();
         }
 
@@ -88,6 +90,7 @@ namespace System.Threading
             }
 
             _task = new Task(() => InnerStart(() => _parameterizedStart(obj)), _tokenSource.Token, TaskCreationOptions.LongRunning);
+            _task.ContinueWith((t) => { IsAlive = false; ThreadState = ThreadState.Stopped; });
             _task.Start();
         }
 
@@ -126,6 +129,7 @@ namespace System.Threading
 
             if (this == CurrentThread)
             {
+                ThreadState = ThreadState.Aborted;
                 throw new ThreadAbortException();
             }
         }

@@ -18,6 +18,7 @@ namespace System.Threading
         public bool IsAlive => _task != null && !(_task.IsCanceled || _task.IsCompleted || _task.IsFaulted);
         public CultureInfo CurrentCulture => throw new NotImplementedException();
         private static SemaphoreSlim _unavailable = new SemaphoreSlim(0, 1);
+        public ThreadPriority Priority { get; set; } = ThreadPriority.Normal;
 
         private enum StartType
         {

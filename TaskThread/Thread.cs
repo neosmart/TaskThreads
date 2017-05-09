@@ -19,6 +19,7 @@ namespace System.Threading
         public CultureInfo CurrentCulture => throw new NotImplementedException();
         private static SemaphoreSlim _unavailable = new SemaphoreSlim(0, 1);
         public ThreadPriority Priority { get; set; } = ThreadPriority.Normal;
+        public ThreadState ThreadState { get; private set; } = ThreadState.Unstarted;
 
         private enum StartType
         {
@@ -42,6 +43,13 @@ namespace System.Threading
             _start = threadStart;
         }
 
+        private void InnerStart(Action action)
+        {
+            ThreadState = ThreadState.Running;
+            action();
+            ThreadState = ThreadState.Stopped;
+        }
+
         public void Start()
         {
             if (_startType == StartType.Parameterized)
@@ -54,7 +62,7 @@ namespace System.Threading
                 throw new ThreadStateException("Thread already started!");
             }
 
-            _task = new Task(() => _start(), _tokenSource.Token, TaskCreationOptions.LongRunning);
+            _task = new Task(() => InnerStart(() => _start()), _tokenSource.Token, TaskCreationOptions.LongRunning);
             if (IsBackground)
             {
                 _task.Start();
@@ -77,7 +85,7 @@ namespace System.Threading
                 throw new ThreadStateException("Thread already started!");
             }
 
-            _task = new Task(() => _parameterizedStart(obj), _tokenSource.Token, TaskCreationOptions.LongRunning);
+            _task = new Task(() => InnerStart(() => _parameterizedStart(obj)), _tokenSource.Token, TaskCreationOptions.LongRunning);
             if (IsBackground)
             {
                 _task.Start();

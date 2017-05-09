@@ -26,6 +26,24 @@ namespace TaskThreadTest
         }
 
         [TestMethod]
+        public void ParameterizedThreadCreateTest()
+        {
+            Object passedObject = null;
+            ParameterizedThreadStart pStart = delegate(object obj)
+            {
+                passedObject = obj;
+            };
+
+            var thread = new Thread(pStart);
+
+            var pObject = new Object();
+            thread.Start(pObject);
+            thread.Join();
+
+            Assert.AreEqual(pObject, passedObject);
+        }
+
+        [TestMethod]
         public void ValidateThreadWork()
         {
             //purposely using a separate event instead of relying on thread.Wait() to make this test independent
@@ -127,6 +145,7 @@ namespace TaskThreadTest
             outerThread.Start();
             outerThread.Join();
 
+            Assert.AreNotEqual(Thread.CurrentThread, innerThread);
             Assert.AreEqual(thisThread, Thread.CurrentThread);
         }
 

@@ -45,7 +45,7 @@ namespace System.Threading
 
         private void InnerStart(Action action)
         {
-            ThreadState = ThreadState.Running;
+            ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
             action();
             ThreadState = ThreadState.Stopped;
         }
@@ -109,17 +109,28 @@ namespace System.Threading
 
         public void Abort()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            if (IsAlive)
+            {
+                ThreadState = ThreadState.AbortRequested;
+            }
         }
 
         public void Suspend()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            if (IsAlive)
+            {
+                ThreadState = ThreadState.SuspendRequested;
+            }
         }
 
         public void Resume()
         {
-            throw new NotImplementedException();
+            if (ThreadState == ThreadState.Suspended || ThreadState == ThreadState.SuspendRequested)
+            {
+                ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
+            }
         }
 
         public static void GetDomain()

@@ -27,7 +27,7 @@ namespace System.Threading
             }
         }
         public bool IsAlive { get; private set; } = false;
-        public CultureInfo CurrentCulture => throw new NotImplementedException();
+        public CultureInfo CurrentCulture { get; private set; }
         private ManualResetEventSlim _taskStarted = new ManualResetEventSlim(false);
         private static SemaphoreSlim _unavailable = new SemaphoreSlim(0, 1);
         private SemaphoreSlim _threadSuspend = null;
@@ -44,6 +44,7 @@ namespace System.Threading
                 {
                     _currentThread = new Thread()
                     {
+                        CurrentCulture = CultureInfo.CurrentCulture,
                         _managedThreadId = Interlocked.Increment(ref _globalThreadId),
                         ThreadState = ThreadState.Running,
                         IsAlive = true,
@@ -94,6 +95,7 @@ namespace System.Threading
         private void InnerStart(Action action)
         {
             _currentThread = this;
+            CurrentCulture = CultureInfo.CurrentCulture;
             _managedThreadId = Interlocked.Increment(ref _globalThreadId);
             IsAlive = true;
             ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;

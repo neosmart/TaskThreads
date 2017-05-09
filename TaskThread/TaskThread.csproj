@@ -14,6 +14,8 @@
     <PackageReleaseNotes>Initial release for UAP/UWP</PackageReleaseNotes>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Product>System.Threading.Thread for UWP/UAP</Product>
+    <AssemblyName>TaskThread</AssemblyName>
+    <RootNamespace>System.Threading</RootNamespace>
   </PropertyGroup>
 
 </Project>

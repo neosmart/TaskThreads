@@ -11,7 +11,6 @@ namespace System.Threading
     public class Thread
     {
         private Task _task;
-        private CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
         public string Name { get; set; } = string.Empty;
         private bool _isBackground = false;
@@ -122,7 +121,7 @@ namespace System.Threading
                 throw new ThreadStateException("Thread already started!");
             }
 
-            _task = new Task(() => InnerStart(() => _start()), _tokenSource.Token, TaskCreationOptions.LongRunning);
+            _task = new Task(() => InnerStart(() => _start()), TaskCreationOptions.LongRunning);
             _task.ContinueWith((t) => { IsAlive = false; ThreadState = ThreadState.Stopped; });
             _task.Start();
         }
@@ -139,7 +138,7 @@ namespace System.Threading
                 throw new ThreadStateException("Thread already started!");
             }
 
-            _task = new Task(() => InnerStart(() => _parameterizedStart(obj)), _tokenSource.Token, TaskCreationOptions.LongRunning);
+            _task = new Task(() => InnerStart(() => _parameterizedStart(obj)), TaskCreationOptions.LongRunning);
             _task.ContinueWith((t) => { IsAlive = false; ThreadState = ThreadState.Stopped; });
             _task.Start();
         }

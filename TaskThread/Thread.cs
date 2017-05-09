@@ -100,6 +100,9 @@ namespace System.Threading
             IsAlive = true;
             ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
             _taskStarted.Set();
+            //free up the reference to _taskStarted, we'll only wait on it if it's not null
+            //since we do this after _task has been initialized, callers will see either _task or _taskStarted
+            _taskStarted = null;
 
             try
             {
@@ -158,7 +161,7 @@ namespace System.Threading
             }
 
             CurrentThread.ThreadState = ThreadState.WaitSleepJoin;
-            _taskStarted.Wait();
+            _taskStarted?.Wait();
             _task.Wait();
             CurrentThread.ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
         }
@@ -176,7 +179,7 @@ namespace System.Threading
             }
 
             CurrentThread.ThreadState = ThreadState.WaitSleepJoin;
-            _taskStarted.Wait();
+            _taskStarted?.Wait();
             bool waitResult = _task.Wait(milliseconds);
             CurrentThread.ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
 
@@ -196,7 +199,7 @@ namespace System.Threading
             }
 
             CurrentThread.ThreadState = ThreadState.WaitSleepJoin;
-            _taskStarted.Wait();
+            _taskStarted?.Wait();
             bool waitResult = _task.Wait(timeout);
             CurrentThread.ThreadState = CurrentThread.IsBackground ? ThreadState.Background : ThreadState.Running;
 

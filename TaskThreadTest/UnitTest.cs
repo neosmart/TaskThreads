@@ -37,10 +37,24 @@ namespace TaskThreadTest
                 workDone.Set();
             });
 
-            Assert.AreNotEqual(x, 42);
+            Assert.AreNotEqual(42, x);
             thread.Start();
             workDone.Wait();
-            Assert.AreEqual(x, 42);
+            Assert.AreEqual(42, x);
+        }
+
+        [TestMethod]
+        public void CurrentThreadNotNull()
+        {
+            Assert.IsNotNull(Thread.CurrentThread);
+        }
+
+        [TestMethod]
+        public void ValidateSleep()
+        {
+            var start = DateTime.UtcNow;
+            Thread.Sleep(600);
+            Assert.IsTrue(DateTime.UtcNow > start + TimeSpan.FromMilliseconds(600));
         }
 
         [TestMethod]
@@ -49,14 +63,14 @@ namespace TaskThreadTest
             int x = 0;
             var thread = new Thread(() =>
             {
-                //await Task.Delay(5000);
+                Thread.Sleep(200);
                 x = 42;
             });
 
-            Assert.AreNotEqual(x, 42);
+            Assert.AreNotEqual(42, x);
             thread.Start();
             thread.Join();
-            Assert.AreEqual(x, 42);
+            Assert.AreEqual(42, x);
         }
     }
 }

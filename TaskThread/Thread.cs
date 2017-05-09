@@ -29,18 +29,30 @@ namespace System.Threading
         }
         public bool IsAlive { get; private set; } = false;
         public CultureInfo CurrentCulture => throw new NotImplementedException();
+        private ManualResetEventSlim _taskStarted = new ManualResetEventSlim(false);
         private static SemaphoreSlim _unavailable = new SemaphoreSlim(0, 1);
         private SemaphoreSlim _threadSuspend = null;
         public ThreadPriority Priority { get; set; } = ThreadPriority.Normal;
         public ThreadState ThreadState { get; private set; } = ThreadState.Unstarted;
 
         [ThreadStatic]
-        public static Thread CurrentThread = new Thread()
+        private static Thread _currentThread;
+        public static Thread CurrentThread
         {
-            _managedThreadId = Interlocked.Increment(ref _globalThreadId),
-            ThreadState = ThreadState.Running,
-            IsAlive = true,
-        };
+            get
+            {
+                if (_currentThread == null)
+                {
+                    _currentThread = new Thread()
+                    {
+                        _managedThreadId = Interlocked.Increment(ref _globalThreadId),
+                        ThreadState = ThreadState.Running,
+                        IsAlive = true,
+                    };
+                }
+                return _currentThread;
+            }
+        }
 
         private static int _globalThreadId = 0;
         private int _managedThreadId = -42;
@@ -85,6 +97,7 @@ namespace System.Threading
             _managedThreadId = Interlocked.Increment(ref _globalThreadId);
             IsAlive = true;
             ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
+            _taskStarted.Set();
             action();
         }
 
@@ -124,34 +137,36 @@ namespace System.Threading
 
         public void Join()
         {
-            if (ThreadState == ThreadState.Unstarted)
-            {
-                throw new ThreadStateException("Cannot join an unstarted thread!");
-            }
             if (this == CurrentThread)
             {
                 //stop caller from doing something stupid
                 return;
             }
+            if (ThreadState == ThreadState.Unstarted)
+            {
+                throw new ThreadStateException("Cannot join an unstarted thread!");
+            }
 
             CurrentThread.ThreadState = ThreadState.WaitSleepJoin;
+            _taskStarted.Wait();
             _task.Wait();
             CurrentThread.ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
         }
 
         public bool Join(Int32 milliseconds)
         {
-            if (ThreadState == ThreadState.Unstarted)
-            {
-                throw new ThreadStateException("Cannot join an unstarted thread!");
-            }
             if (this == CurrentThread)
             {
                 //stop caller from doing something stupid
                 return true;
             }
+            if (ThreadState == ThreadState.Unstarted)
+            {
+                throw new ThreadStateException("Cannot join an unstarted thread!");
+            }
 
             CurrentThread.ThreadState = ThreadState.WaitSleepJoin;
+            _taskStarted.Wait();
             bool waitResult = _task.Wait(milliseconds);
             CurrentThread.ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
 
@@ -160,17 +175,18 @@ namespace System.Threading
 
         public bool Join(TimeSpan timeout)
         {
-            if (ThreadState == ThreadState.Unstarted)
-            {
-                throw new ThreadStateException("Cannot join an unstarted thread!");
-            }
             if (this == CurrentThread)
             {
                 //stop caller from doing something stupid
                 return true;
             }
+            if (ThreadState == ThreadState.Unstarted)
+            {
+                throw new ThreadStateException("Cannot join an unstarted thread!");
+            }
 
             CurrentThread.ThreadState = ThreadState.WaitSleepJoin;
+            _taskStarted.Wait();
             bool waitResult = _task.Wait(timeout);
             CurrentThread.ThreadState = CurrentThread.IsBackground ? ThreadState.Background : ThreadState.Running;
 

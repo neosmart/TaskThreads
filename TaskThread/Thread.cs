@@ -259,11 +259,6 @@ namespace System.Threading
                 ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
             }
         }
-
-        public static void GetDomain()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
 #endif

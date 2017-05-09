@@ -25,9 +25,24 @@ namespace System.Threading
         [ThreadStatic]
         public static Thread CurrentThread = new Thread()
         {
+            _managedThreadId = Interlocked.Increment(ref _globalThreadId),
             ThreadState = ThreadState.Running,
             IsAlive = true,
         };
+
+        private static int _globalThreadId = 0;
+        private int _managedThreadId = -42;
+        public int ManagedThreadId
+        {
+            get
+            {
+                if (_managedThreadId == -42)
+                {
+                    throw new ThreadStateException("Cannot get managed thread id of unstarted thread!");
+                }
+                return _managedThreadId;
+            }
+        }
 
         private enum StartType
         {
@@ -55,6 +70,7 @@ namespace System.Threading
 
         private void InnerStart(Action action)
         {
+            _managedThreadId = Interlocked.Increment(ref _globalThreadId);
             IsAlive = true;
             ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
             action();

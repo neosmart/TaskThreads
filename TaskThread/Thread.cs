@@ -94,6 +94,7 @@ namespace System.Threading
 
         private void InnerStart(Action action)
         {
+            _currentThread = this;
             _managedThreadId = Interlocked.Increment(ref _globalThreadId);
             IsAlive = true;
             ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;

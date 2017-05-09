@@ -72,5 +72,77 @@ namespace TaskThreadTest
             thread.Join();
             Assert.AreEqual(42, x);
         }
+
+        [TestMethod]
+        public void ThreadIdChanges()
+        {
+            var threadId1 = Thread.CurrentThread.ManagedThreadId;
+            var threadId2 = 0;
+
+            var thread = new Thread(() =>
+            {
+                threadId2 = Thread.CurrentThread.ManagedThreadId;
+            });
+
+            thread.Start();
+            thread.Join();
+            Assert.AreNotEqual(threadId1, threadId2);
+        }
+
+        [TestMethod]
+        public void ThreadIdStaysSame()
+        {
+            var threadRef1 = Thread.CurrentThread;
+            var threadRef2 = Thread.CurrentThread;
+
+            Assert.AreEqual(threadRef1, threadRef2);
+        }
+
+        [TestMethod]
+        public void ThreadEqualityOverriden()
+        {
+            Thread innerThread = null;
+            var outerThread = new Thread(() =>
+            {
+                innerThread = Thread.CurrentThread;
+            });
+
+            outerThread.Start();
+            outerThread.Join();
+
+            Assert.AreEqual(innerThread, outerThread);
+        }
+
+        [TestMethod]
+        public void CurrentThreadPreserved()
+        {
+            Thread thisThread = Thread.CurrentThread;
+            Thread innerThread = null;
+            var outerThread = new Thread(() =>
+            {
+                innerThread = Thread.CurrentThread;
+            });
+
+            outerThread.Start();
+            outerThread.Join();
+
+            Assert.AreEqual(thisThread, Thread.CurrentThread);
+        }
+
+        [TestMethod]
+        public void RunsInSeparateThread()
+        {
+            Thread thisThread = Thread.CurrentThread;
+            Thread innerThread = null;
+            var outerThread = new Thread(() =>
+            {
+                innerThread = Thread.CurrentThread;
+            });
+
+            outerThread.Start();
+            outerThread.Join();
+
+            Assert.AreNotEqual(innerThread.ManagedThreadId, thisThread.ManagedThreadId);
+        }
     }
 }

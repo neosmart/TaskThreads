@@ -112,6 +112,11 @@ namespace System.Threading
             {
                 //absorb all exceptions
             }
+            finally
+            {
+                IsAlive = false;
+                ThreadState = ThreadState.Stopped;
+            }
         }
 
         public void Start()
@@ -127,7 +132,6 @@ namespace System.Threading
             }
 
             _task = new Task(() => InnerStart(() => _start()), TaskCreationOptions.LongRunning);
-            _task.ContinueWith((t) => { IsAlive = false; ThreadState = ThreadState.Stopped; });
             _task.Start();
         }
 
@@ -144,7 +148,6 @@ namespace System.Threading
             }
 
             _task = new Task(() => InnerStart(() => _parameterizedStart(obj)), TaskCreationOptions.LongRunning);
-            _task.ContinueWith((t) => { IsAlive = false; ThreadState = ThreadState.Stopped; });
             _task.Start();
         }
 

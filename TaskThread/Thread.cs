@@ -18,8 +18,15 @@ namespace System.Threading
         public bool IsAlive => _task != null && !(_task.IsCanceled || _task.IsCompleted || _task.IsFaulted);
         public CultureInfo CurrentCulture => throw new NotImplementedException();
         private static SemaphoreSlim _unavailable = new SemaphoreSlim(0, 1);
+        private static SemaphoreSlim _threadSuspend = new SemaphoreSlim(0, 1);
         public ThreadPriority Priority { get; set; } = ThreadPriority.Normal;
         public ThreadState ThreadState { get; private set; } = ThreadState.Unstarted;
+
+        [ThreadStatic]
+        public static Thread CurrentThread = new Thread()
+        {
+            ThreadState = ThreadState.Running
+        };
 
         private enum StartType
         {
@@ -30,6 +37,8 @@ namespace System.Threading
         StartType _startType;
         ParameterizedThreadStart _parameterizedStart;
         ThreadStart _start;
+
+        private Thread() { }
 
         public Thread(ParameterizedThreadStart threadStart, int maxStackSize = 0)
         {
@@ -114,20 +123,36 @@ namespace System.Threading
             {
                 ThreadState = ThreadState.AbortRequested;
             }
+
+            if (this == CurrentThread)
+            {
+                throw new ThreadAbortException();
+            }
         }
 
         public void Suspend()
         {
             //throw new NotImplementedException();
-            if (IsAlive)
+            if (ThreadState == ThreadState.Running || ThreadState == ThreadState.Background)
             {
                 ThreadState = ThreadState.SuspendRequested;
+
+                if (this == CurrentThread)
+                {
+                    ThreadState = ThreadState.Suspended;
+                    _threadSuspend.Wait();
+                    ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
+                }
             }
         }
 
         public void Resume()
         {
-            if (ThreadState == ThreadState.Suspended || ThreadState == ThreadState.SuspendRequested)
+            if (this == CurrentThread && ThreadState == ThreadState.Suspended)
+            {
+                _threadSuspend.Release();
+            }
+            else if (ThreadState == ThreadState.Suspended || ThreadState == ThreadState.SuspendRequested)
             {
                 ThreadState = IsBackground ? ThreadState.Background : ThreadState.Running;
             }

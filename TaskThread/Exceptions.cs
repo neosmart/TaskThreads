@@ -10,4 +10,11 @@ namespace System.Threading
             : base(message, innerException)
         { }
     }
+
+    public class ThreadAbortException: Exception
+    {
+        public ThreadAbortException(string message = "", Exception innerException = null)
+                    : base(message, innerException)
+        { }
+    }
 }

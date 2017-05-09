@@ -142,7 +142,7 @@ namespace System.Threading
                 //stop caller from doing something stupid
                 return;
             }
-            if (ThreadState == ThreadState.Unstarted)
+            if (_task == null)
             {
                 throw new ThreadStateException("Cannot join an unstarted thread!");
             }
@@ -160,7 +160,7 @@ namespace System.Threading
                 //stop caller from doing something stupid
                 return true;
             }
-            if (ThreadState == ThreadState.Unstarted)
+            if (_task == null)
             {
                 throw new ThreadStateException("Cannot join an unstarted thread!");
             }
@@ -180,7 +180,7 @@ namespace System.Threading
                 //stop caller from doing something stupid
                 return true;
             }
-            if (ThreadState == ThreadState.Unstarted)
+            if (_task == null)
             {
                 throw new ThreadStateException("Cannot join an unstarted thread!");
             }

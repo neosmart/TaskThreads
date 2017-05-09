@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.4</TargetFramework>
-    <Authors>Mahmoud Al-Qudsi</Authors>
+    <Authors>NeoSmart Technologies, Mahmoud Al-Qudsi</Authors>
     <Company>NeoSmart Technologies</Company>
     <Description>A replacement for System.Threading.Thread for UAP/UWP targets.</Description>
     <Copyright>2017 NeoSmart Technologies</Copyright>
@@ -10,12 +10,13 @@
     <PackageProjectUrl>https://github.com/neosmart/TaskThreads/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/neosmart/TaskThreads/</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>system.threading.thread, uwp, uap, taskthreads</PackageTags>
+    <PackageTags>system.threading.thread, uwp, uap, taskthreads, taskthread</PackageTags>
     <PackageReleaseNotes>Initial release for UAP/UWP</PackageReleaseNotes>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Product>System.Threading.Thread for UWP/UAP</Product>
     <AssemblyName>TaskThread</AssemblyName>
     <RootNamespace>System.Threading</RootNamespace>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
 </Project>

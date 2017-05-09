@@ -18,7 +18,7 @@ namespace System.Threading
         public bool IsAlive { get; set; } = false;
         public CultureInfo CurrentCulture => throw new NotImplementedException();
         private static SemaphoreSlim _unavailable = new SemaphoreSlim(0, 1);
-        private static SemaphoreSlim _threadSuspend = new SemaphoreSlim(0, 1);
+        private SemaphoreSlim _threadSuspend = new SemaphoreSlim(0, 1);
         public ThreadPriority Priority { get; set; } = ThreadPriority.Normal;
         public ThreadState ThreadState { get; private set; } = ThreadState.Unstarted;
 

@@ -13,8 +13,8 @@ namespace System.Threading
         private Task _task;
         private CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
-        public string Name { get; set; }
-        public bool IsBackground { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public bool IsBackground { get; set; } = true;
         public bool IsAlive => _task != null && !(_task.IsCanceled || _task.IsCompleted || _task.IsFaulted);
         public CultureInfo CurrentCulture => throw new NotImplementedException();
         private static SemaphoreSlim _unavailable = new SemaphoreSlim(0, 1);

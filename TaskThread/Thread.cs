@@ -14,7 +14,7 @@ namespace System.Threading
         private CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
         public string Name { get; set; } = string.Empty;
-        public bool IsBackground { get; set; } = true;
+        public bool IsBackground { get; set; } = false;
         public bool IsAlive => _task != null && !(_task.IsCanceled || _task.IsCompleted || _task.IsFaulted);
         public CultureInfo CurrentCulture => throw new NotImplementedException();
         private static SemaphoreSlim _unavailable = new SemaphoreSlim(0, 1);
@@ -63,14 +63,7 @@ namespace System.Threading
             }
 
             _task = new Task(() => InnerStart(() => _start()), _tokenSource.Token, TaskCreationOptions.LongRunning);
-            if (IsBackground)
-            {
-                _task.Start();
-            }
-            else
-            {
-                _task.RunSynchronously();
-            }
+            _task.Start();
         }
 
         public void Start(object obj)
@@ -86,14 +79,7 @@ namespace System.Threading
             }
 
             _task = new Task(() => InnerStart(() => _parameterizedStart(obj)), _tokenSource.Token, TaskCreationOptions.LongRunning);
-            if (IsBackground)
-            {
-                _task.Start();
-            }
-            else
-            {
-                _task.RunSynchronously();
-            }
+            _task.Start();
         }
 
         public void Join()

@@ -23,4 +23,10 @@
         AbortRequested,
         Aborted
     }
+
+    enum StartType
+    {
+        Standard,
+        Parameterized
+    };
 }

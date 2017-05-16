@@ -71,9 +71,12 @@ namespace TaskThreadTest
         [TestMethod]
         public void ValidateSleep()
         {
+            var amount = 600;
             var start = DateTime.UtcNow;
-            Thread.Sleep(600);
-            Assert.IsTrue(DateTime.UtcNow > start + TimeSpan.FromMilliseconds(600));
+            Thread.Sleep(amount);
+            //it's not a precise science, so let's leave a 20% wiggle-room.
+            //it's enough to tell us if it's working or not.
+            Assert.IsTrue(DateTime.UtcNow > start + TimeSpan.FromMilliseconds(amount * 0.8));
         }
 
         [TestMethod]
